@@ -1,0 +1,21 @@
+# --- LÖVE / Gaming ---
+*.love
+/bin/
+/build/
+/dist/
+
+# --- Linux / Fedora Junk ---
+.directory
+*~
+.fuse_hidden*
+.nfs*
+
+# --- Windows / MacOS Junk (for collaborators) ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# --- IDEs ---
+.vscode/
+.idea/
+
