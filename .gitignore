@@ -3,7 +3,7 @@
 /bin/
 /build/
 /dist/
-*.AppImage
+*.appimage
 
 # --- Linux / Fedora Junk ---
 .directory
