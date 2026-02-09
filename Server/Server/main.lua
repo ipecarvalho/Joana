@@ -1,4 +1,4 @@
-﻿local enet = require "enet"
+local enet = require "enet"
 
 function love.load()
     -- Listen on all interfaces at port 12345
@@ -31,7 +31,13 @@ elseif event.type == "receive" then
             local chat_content = event.data:match("^CHAT:(.+)$")
             if chat_content then
                 local name = world[id] and world[id].nm or "Unknown"
-                host:broadcast("CHAT:" .. name .. ": " .. chat_content)
+                local chat_message = "CHAT:" .. name .. ": " .. chat_content
+                -- Broadcast to all peers except the sender
+                for _, peer in ipairs(host:peers()) do
+                    if peer:index() ~= id then
+                        peer:send(chat_message)
+                    end
+                end
                 print("[CHAT] " .. name .. ": " .. chat_content)
 
             -- 2. Handle ID Request
@@ -41,7 +47,7 @@ elseif event.type == "receive" then
             -- 3. Handle Movement (The 8 variables)
             else
                 local x, y, ang, nm, r, g, b, f = event.data:match("([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)")
-                if x and y and ang and nm and r and f then
+                if x and y and ang and nm and r then
                     world[id] = {
                         x = x, y = y, ang = ang, nm = nm, 
                         r = r, g = g, b = b, f = f, 
