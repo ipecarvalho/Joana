@@ -49,43 +49,40 @@ function love.textinput(t)
 end
 
 function love.keypressed(key)
-    if gameState == "LOGIN" then
-        if key == "return" and #ui_state.current_input > 0 then
-            local_p.name = ui_state.current_input
-            ui_state.current_input = ""
-            gameState = "PLAYING"
+if gameState == "LOGIN" then
+    if key == "return" and #ui_state.current_input > 0 then
+        local_p.name = ui_state.current_input
+        ui_state.current_input = ""
+        gameState = "PLAYING"
         elseif key == "backspace" then
             ui_state.current_input = ui_state.current_input:sub(1, -2)
-        end
-    
-    elseif gameState == "PLAYING" then
-        -- Open chat
-        if key == "t" and not ui_state.is_chatting then
-            ui_state.is_chatting = true
-            ui_state.current_input = ""
-            -- We return here so the 't' doesn't get processed further in this frame
-            return 
-        end
-
-        -- Handle active chat
-        if ui_state.is_chatting then
-            if key == "return" then
-                if #ui_state.current_input > 0 then
-                    server:send("CHAT:" .. ui_state.current_input)
-                    UILogic.add_message(ui_state, local_p.name .. ": " .. ui_state.current_input)
-                end
-                ui_state.is_chatting = false
-                ui_state.current_input = ""
-            elseif key == "backspace" then
-                ui_state.current_input = ui_state.current_input:sub(1, -2)
-            elseif key == "escape" then
-                ui_state.is_chatting = false
-                ui_state.current_input = ""
             end
-        end
-    end
-end
 
+            elseif gameState == "PLAYING" then
+                -- 1. If chat is CLOSED and you press T, open it
+                if key == "t" and not ui_state.is_chatting then
+                    ui_state.is_chatting = true
+                    ui_state.current_input = ""
+                    return -- Stop here so 't' doesn't enter the box
+                    end
+
+                    -- 2. If chat is OPEN, handle the typing keys
+                    if ui_state.is_chatting then
+                        if key == "return" then
+                            if #ui_state.current_input > 0 then
+                                server:send("CHAT:" .. ui_state.current_input)
+                                end
+                                ui_state.is_chatting = false
+                                ui_state.current_input = ""
+                                elseif key == "backspace" then
+                                    ui_state.current_input = ui_state.current_input:sub(1, -2)
+                                    elseif key == "escape" then
+                                        ui_state.is_chatting = false
+                                        ui_state.current_input = ""
+                                        end
+                                        end
+                                        end
+                                        end
 function love.update(dt)
     if not host then return end
 

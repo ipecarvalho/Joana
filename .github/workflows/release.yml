@@ -1,0 +1,49 @@
+name: Build and Release Joana
+
+on:
+  push:
+    tags:
+      - 'v*' # Triggers whenever you push a tag like v1.0, v1.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Zip
+        run: sudo apt-get install zip
+
+      - name: Download Windows LOVE Binaries
+        run: |
+          wget https://github.com/love2d/love/releases/download/11.5/love-11.5-win64.zip
+          unzip love-11.5-win64.zip -d love_win
+
+      - name: Create .love file
+        run: |
+          # We assume your code is in the JorgeXD folder
+          cd JorgeXD
+          zip -r ../Joana.love .
+          cd ..
+
+      - name: Fuse Executable and Prepare Zip
+        run: |
+          mkdir build_win
+          cat love_win/love.exe Joana.love > build_win/Joana.exe
+          cp love_win/*.dll build_win/
+          cp love_win/license.txt build_win/
+          # Include your sprites
+          cp JorgeXD/*.png build_win/
+          cd build_win
+          zip -r ../Joana_Windows.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: Joana_Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
